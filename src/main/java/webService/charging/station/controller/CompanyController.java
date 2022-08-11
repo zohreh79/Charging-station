@@ -40,7 +40,7 @@ public class CompanyController {
         List<CompanyResponse> companyResponses = new ArrayList<>();
 
         if (!allCompanies.isEmpty()) {
-            logger.info("getAllCompanyInfo => all companies found returning the result.");
+            logger.info("getAllCompanyInfo => all companies found: returning the result.");
 
             //getInformation method of company service creates the responses and returns a list of this responses
             companyResponses = companyService.getInformation(allCompanies);
@@ -91,7 +91,7 @@ public class CompanyController {
 
         Company company = companyRepository.findById(companyId);
         if (company == null) {
-            logger.error("company controller => deleteOperation => no companies found with this company name!");
+            logger.error("company controller => deleteOperation => no companies found with this company id!");
             return new ResponseEntity<>("no companies found with this id!", HttpStatus.NOT_FOUND);
         }
 
@@ -112,7 +112,7 @@ public class CompanyController {
 
         Company company = companyRepository.findById(companyId);
         if (company == null) {
-            logger.error("company controller => updateOperation => no companies found with this company name!");
+            logger.error("company controller => updateOperation => no companies found with this company id!");
             return new ResponseEntity<>("no companies found with this id!", HttpStatus.NOT_FOUND);
         }
 
@@ -144,6 +144,11 @@ public class CompanyController {
             logger.info("company controller => addOperation => request body should have at least a name to save into DB.");
             return new ResponseEntity<>("A company must have a name!", HttpStatus.BAD_REQUEST);
         }
+        Company companyExistence = companyRepository.findByName(request.getName());
+        if (companyExistence != null) {
+            logger.error("company controller => addOperation => company already exists!");
+            return new ResponseEntity<>("company already exists!", HttpStatus.CONFLICT);
+        }
 
         //creating a new company instance to add into DB
         Company company = new Company(
@@ -159,6 +164,6 @@ public class CompanyController {
             logger.error("company controller => addOperation => DB error : error on adding new entity: " + e);
             return new ResponseEntity<>("Error on adding new entity!", HttpStatus.EXPECTATION_FAILED);
         }
-        return ResponseEntity.ok("company added successfully");
+        return new ResponseEntity<>("company added successfully", HttpStatus.CREATED);
     }
 }

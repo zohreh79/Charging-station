@@ -3,8 +3,8 @@ package webService.charging.station.model;
 public class StationRequest {
 
     private String name;
-    private double latitude;
-    private double longitude;
+    private double latitude = 0;
+    private double longitude = 0;
     private String companyName;
 
     public String getName() {
