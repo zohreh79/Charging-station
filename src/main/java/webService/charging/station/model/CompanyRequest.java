@@ -1,10 +1,12 @@
 package webService.charging.station.model;
 
+import java.util.List;
+
 public class CompanyRequest {
 
     private String name;
     private String parentCompany;
-    private String subCompany;
+    private List<String> subCompany;
 
     public String getName() {
         return name;
@@ -22,11 +24,11 @@ public class CompanyRequest {
         this.parentCompany = parentCompany;
     }
 
-    public String getSubCompany() {
+    public List<String> getSubCompany() {
         return subCompany;
     }
 
-    public void setSubCompany(String subCompany) {
+    public void setSubCompany(List<String> subCompany) {
         this.subCompany = subCompany;
     }
 }

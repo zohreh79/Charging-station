@@ -12,6 +12,7 @@ public class Company {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int id;
 
     @Column(name = "name")
@@ -23,7 +24,7 @@ public class Company {
     private Company parentCompany;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "sub_id")
     private List<Company> subCompany;
 
@@ -39,6 +40,12 @@ public class Company {
         this.parentCompany = parentCompany;
         this.subCompany = subCompany;
         this.station = station;
+    }
+
+    public Company(String name, Company parentCompany, List<Company> subCompany) {
+        this.name = name;
+        this.parentCompany = parentCompany;
+        this.subCompany = subCompany;
     }
 
     public int getId() {
