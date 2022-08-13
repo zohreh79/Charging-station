@@ -64,12 +64,17 @@ public class StationService {
         //θ - latitude
         //φ - longitude
 
-        double earthRadius = 6371;
-        double sin2Lat = Math.sin((point2Lat - point1Lat) / 2) * Math.sin((point2Lat - point1Lat) / 2);
-        double sin2Long = Math.sin((point2Long - point1Long) / 2) * Math.sin((point2Long - point1Long) / 2);
-        double squareRootOfLocation = Math.sqrt(Math.abs(sin2Lat + (Math.cos(point1Lat) * Math.cos(point2Lat) * sin2Long)));
+        double l1 = point1Lat * Math.PI / 180;
+        double l2 = point2Lat * Math.PI / 180;
+        double T1 = (point2Lat - point1Lat) * Math.PI / 180;
+        double T2 = (point2Long - point1Long) * Math.PI / 180;
+        double a = Math.sin(T1 / 2) * Math.sin(T1 / 2) +
+                Math.cos(l1) * Math.cos(l2) *
+                        Math.sin(T2 / 2) * Math.sin(T2 / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return earthRadius * (2 * Math.asin(squareRootOfLocation));
+        double earthRadius = 6371000;
+        return earthRadius * c;
     }
 
     public List<AroundStationsResponse> getLocations(List<Station> stations, double firstPointLat, double firstPointLong) {

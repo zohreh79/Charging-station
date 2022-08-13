@@ -24,11 +24,16 @@ public class Company {
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sub_id")
+    @JoinTable(name = "sub_company",
+            joinColumns = {@JoinColumn(name = "company_id")},
+            inverseJoinColumns = {@JoinColumn(name = "sub_id")})
     private List<Company> subCompany;
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
+        @JoinTable(name = "company_station",
+            joinColumns = {@JoinColumn(name = "company_id")},
+            inverseJoinColumns = {@JoinColumn(name = "station_id")})
     private List<Station> station;
 
     public Company() {
@@ -45,6 +50,11 @@ public class Company {
         this.name = name;
         this.parentCompany = parentCompany;
         this.subCompany = subCompany;
+    }
+
+    public Company(String name, Company parentCompany) {
+        this.name = name;
+        this.parentCompany = parentCompany;
     }
 
     public int getId() {

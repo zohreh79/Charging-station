@@ -9,7 +9,6 @@ public class CompaniesStationsResponse {
 
     private String companyName;
     private List<Station> stations;
-    @JsonIgnore
     private List<CompaniesStationsResponse> subCompaniesStations;
 
     public CompaniesStationsResponse() {

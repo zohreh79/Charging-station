@@ -10,9 +10,12 @@ import webService.charging.station.model.CompaniesStationsResponse;
 import webService.charging.station.model.CompanyRequest;
 import webService.charging.station.model.CompanyResponse;
 import webService.charging.station.model.entity.Company;
+import webService.charging.station.model.entity.Station;
 import webService.charging.station.repository.CompanyRepository;
+import webService.charging.station.repository.StationRepository;
 import webService.charging.station.service.CompanyService;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +26,13 @@ public class CompanyController {
     private static final Logger logger = LoggerFactory.getLogger(CompanyController.class);
 
     private final CompanyRepository companyRepository;
+    private final StationRepository stationRepository;
     private final CompanyService companyService;
 
     @Autowired
-    public CompanyController(CompanyRepository companyRepository, CompanyService companyService) {
+    public CompanyController(CompanyRepository companyRepository, CompanyService companyService, StationRepository stationRepository) {
         this.companyRepository = companyRepository;
+        this.stationRepository = stationRepository;
         this.companyService = companyService;
     }
 
@@ -61,11 +66,12 @@ public class CompanyController {
             return new ResponseEntity<>("no companies found with this company name!", HttpStatus.NOT_FOUND);
         }
 
+        List<Station> stationsList = stationRepository.findByCompany(company);
         logger.info("getSingleCompanyInfo => returning information response.");
         return ResponseEntity.ok(new CompanyResponse(
                 company.getId(),
                 company.getName(),
-                company.getStation(),
+                stationsList,
                 company.getSubCompany(),
                 company.getParentCompany()));
     }
@@ -106,6 +112,7 @@ public class CompanyController {
         return ResponseEntity.ok("operation deleted successfully");
     }
 
+    @Transactional
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<?> updateOperation(@RequestBody CompanyRequest request, @PathVariable(value = "id") int companyId) {
         logger.info("company controller => updateOperation =>  update entity with given company id.");
@@ -119,9 +126,10 @@ public class CompanyController {
         if (request.getParentCompany() != null) {
             Company parentCompany = companyRepository.findByName(request.getParentCompany());
             company.setParentCompany(parentCompany != null ? parentCompany : company.getParentCompany());
+            companyRepository.updateSubCompany(company.getParentCompany().getId(), companyId);
         }
         if (!request.getSubCompany().isEmpty())
-            company.setSubCompany(companyService.getCompaniesList(request.getSubCompany()));
+            company.setSubCompany(companyService.getCompaniesList(request.getSubCompany(), company));
 
         if (request.getName() != null) company.setName(request.getName());
 
@@ -150,15 +158,17 @@ public class CompanyController {
             return new ResponseEntity<>("company already exists!", HttpStatus.CONFLICT);
         }
 
+        Company parentCompany = companyRepository.findByName(request.getParentCompany());
         //creating a new company instance to add into DB
         Company company = new Company(
                 request.getName(),
-                companyRepository.findByName(request.getParentCompany()),
-                companyService.getCompaniesList(request.getSubCompany()));
+                parentCompany);
 
         //in this method company repository adds new data
         try {
+            company.setSubCompany(companyService.getCompaniesList(request.getSubCompany(), company));
             companyRepository.save(company);
+            companyService.checkSubCompanies(company, parentCompany);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("company controller => addOperation => DB error : error on adding new entity: " + e);

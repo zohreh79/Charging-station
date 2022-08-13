@@ -89,8 +89,8 @@ public class StationController {
         List<Station> stationsList = stationRepository.findPositionsBetweenMaxAndMin(
                 minAndMaxPositions.get("maxLat"),
                 minAndMaxPositions.get("minLat"),
-                minAndMaxPositions.get("minLong"),
-                minAndMaxPositions.get("maxLong"));
+                minAndMaxPositions.get("maxLong"),
+                minAndMaxPositions.get("minLong"));
 
         List<AroundStationsResponse> aroundStationsResponses = stationService.getLocations(stationsList, location.get(1), location.get(0));
         return ResponseEntity.ok(aroundStationsResponses);

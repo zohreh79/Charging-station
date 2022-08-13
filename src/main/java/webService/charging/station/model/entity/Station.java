@@ -22,9 +22,13 @@ public class Station {
     @Column(name = "longitude")
     private double longitude;
 
+
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "company_id", nullable = false)
+        @JoinColumn(name = "company_id", nullable = false)
+//    @JoinTable(name = "company_station",
+//            joinColumns = {@JoinColumn(name = "station_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "company_id")})
     private Company company;
 
     public Station() {

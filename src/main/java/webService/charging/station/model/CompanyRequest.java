@@ -1,12 +1,13 @@
 package webService.charging.station.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompanyRequest {
 
     private String name;
     private String parentCompany;
-    private List<String> subCompany;
+    private List<String> subCompany = new ArrayList<>();
 
     public String getName() {
         return name;
